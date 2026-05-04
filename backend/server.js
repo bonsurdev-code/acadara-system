@@ -22,6 +22,7 @@ const PORT = process.env.PORT || 5000
 //     origin: 'https://acadara.netlify.app',
 //     credentials: true
 // }))
+app.use(express.static("public"));
 app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true
