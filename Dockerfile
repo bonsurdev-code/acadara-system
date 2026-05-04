@@ -1,14 +1,16 @@
 # Build frontend
-FROM node:18 as frontend-build
+FROM node:22 as frontend-build
 
 WORKDIR /app/frontend
+
 COPY frontend/package*.json ./
 RUN npm install
+
 COPY frontend .
 RUN npm run build
 
 # Backend
-FROM node:18
+FROM node:22
 
 WORKDIR /app
 
@@ -19,7 +21,7 @@ RUN cd backend && npm install
 # Copy backend
 COPY backend ./backend
 
-# Copy built frontend into backend (serve static)
+# Copy built frontend into backend
 COPY --from=frontend-build /app/frontend/dist ./backend/public
 
 WORKDIR /app/backend
