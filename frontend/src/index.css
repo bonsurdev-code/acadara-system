@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+/* Custom color palette for Acadara - Dark Mode Tech */
+:root {
+  --color-bg-primary: #0F172A;      /* Slate 900 - Your base */
+  --color-bg-secondary: #1E293B;    /* Slate 800 */
+  --color-bg-tertiary: #334155;     /* Slate 700 */
+  --color-accent-primary: #3B82F6;  /* Blue 500 */
+  --color-accent-secondary: #8B5CF6; /* Violet 500 */
+  --color-accent-cyan: #06B6D4;     /* Cyan 500 */
+  --color-text-primary: #F8FAFC;    /* Slate 50 */
+  --color-text-secondary: #94A3B8;  /* Slate 400 */
+  --color-text-muted: #64748B;      /* Slate 500 */
+  --color-success: #10B981;         /* Emerald 500 */
+  --color-warning: #F59E0B;         /* Amber 500 */
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #06B6D4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glassmorphism effect */
+.glass {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Glow effects */
+.glow-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.glow-purple {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
