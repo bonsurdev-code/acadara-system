@@ -88,7 +88,7 @@ export const updateApplicationStatus = async (req, res) => {
 
         if (status === 'approved' && application.status !== 'approved') {
             const newUsrId = generateUserId();
-            const rawPassword = 'Acadara2026!'; // Or generate a random one
+            const rawPassword = 'Acadara2026!';
             const hashedPassword = await bcrypt.hash(rawPassword, 10);
             const acadara_email = application.email.split('@')[0] + '@acadara.com';
             // 1. Create User
@@ -107,7 +107,7 @@ export const updateApplicationStatus = async (req, res) => {
             }, { where: { usr_id: newUsrId } });
 
             // 3. SEND EMAIL AUTOMATICALLY
-            await sendCredentialsEmail(application.email, application.full_name, rawPassword);
+            await sendCredentialsEmail(application.email, acadara_email, application.full_name, rawPassword);
         }
 
         await application.update({ status, reviewed_at: new Date() });

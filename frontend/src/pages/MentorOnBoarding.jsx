@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion as Motion } from "framer-motion";
-import { ChevronRight, Loader2, CheckCircle, Target, Zap, ShieldCheck, Globe } from "lucide-react";
+import { ChevronRight, Loader2, CheckCircle, Target, Zap, ShieldCheck, Globe, Link as LinkIcon } from "lucide-react";
 import { adminService } from '../core/api-services/admin.service';
 
 export default function MentorOnboarding() {
@@ -12,13 +12,14 @@ export default function MentorOnboarding() {
   const stagger = {
     visible: { transition: { staggerChildren: 0.1 } }
   };
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
-    expertise: 'Software Engineering',
-    linkedin_url: '',
+    expertise: '',
+    social_url: '',
     bio: ''
   });
 
@@ -30,7 +31,6 @@ export default function MentorOnboarding() {
       const res = await adminService.submitPublicApplication(formData);
       if (res.success) {
         setIsSuccess(true);
-        // Optional: Redirect after 3 seconds
         setTimeout(() => window.location.href = '/', 3000);
       }
     } catch (error) {
@@ -61,7 +61,7 @@ export default function MentorOnboarding() {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           
-          {/* Left Column (Content) - Keep your original UI here */}
+          {/* Left Column (Content) */}
           <Motion.div 
             initial="hidden"
             animate="visible"
@@ -114,7 +114,8 @@ export default function MentorOnboarding() {
                     <input 
                       required
                       type="text"
-                      className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none" 
+                      value={formData.full_name}
+                      className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none transition-colors" 
                       placeholder="John Doe"
                       onChange={(e) => setFormData({...formData, full_name: e.target.value})}
                     />
@@ -124,7 +125,8 @@ export default function MentorOnboarding() {
                     <input 
                       required
                       type="email"
-                      className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none" 
+                      value={formData.email}
+                      className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none transition-colors" 
                       placeholder="john@example.com"
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
                     />
@@ -133,25 +135,25 @@ export default function MentorOnboarding() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-400">Primary Expertise</label>
-                  <select 
-                    className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-slate-300 outline-none"
+                  <input 
+                    required
+                    type="text"
+                    value={formData.expertise}
+                    className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none transition-colors" 
+                    placeholder="e.g. Distributed Systems, Brand Design, etc."
                     onChange={(e) => setFormData({...formData, expertise: e.target.value})}
-                  >
-                    <option>Software Engineering</option>
-                    <option>UI/UX Design</option>
-                    <option>Cybersecurity</option>
-                    <option>Data Science</option>
-                  </select>
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-400">LinkedIn URL</label>
+                  <label className="text-sm font-medium text-slate-400">Social or Portfolio URL</label>
                   <input 
                     required
                     type="url"
-                    className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none" 
-                    placeholder="https://linkedin.com/in/username"
-                    onChange={(e) => setFormData({...formData, linkedin_url: e.target.value})}
+                    value={formData.social_url}
+                    className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none transition-colors" 
+                    placeholder="LinkedIn, X, or Personal Site"
+                    onChange={(e) => setFormData({...formData, social_url: e.target.value})}
                   />
                 </div>
 
@@ -160,8 +162,9 @@ export default function MentorOnboarding() {
                   <textarea 
                     required
                     rows="3"
-                    className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none resize-none" 
-                    placeholder="Describe your expertise..."
+                    value={formData.bio}
+                    className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none resize-none transition-colors" 
+                    placeholder="How do you help your mentees grow?"
                     onChange={(e) => setFormData({...formData, bio: e.target.value})}
                   />
                 </div>
@@ -178,7 +181,8 @@ export default function MentorOnboarding() {
             </div>
           </Motion.div>
         </div>
-        {/* Success Stories Section */}
+
+        {/* How it Works Section */}
         <div className="mt-32">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">How it Works for Mentors</h2>

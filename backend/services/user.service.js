@@ -61,7 +61,7 @@ export const updateUserProfile = async (usr_id, usr_role, updateData) => {
   const roleFields = profileFields[usr_role];
   const dbUpdate = {};
 
-  // 1. Map incoming data to DB columns
+  // Map incoming data to DB columns
   Object.keys(updateData).forEach(key => {
     if (roleFields[key]) {
       dbUpdate[roleFields[key]] = (key === 'availability') 
@@ -70,7 +70,7 @@ export const updateUserProfile = async (usr_id, usr_role, updateData) => {
     }
   });
 
-  // 2. Fetch current profile to handle partial updates
+  // Fetch current profile to handle partial updates
   const Model = usr_role === 'mentee' ? Mentee : Mentor;
   const currentProfile = await Model.findOne({ where: { usr_id } });
 
@@ -96,7 +96,7 @@ export const updateUserProfile = async (usr_id, usr_role, updateData) => {
     dbUpdate.mentee_embedding = await getEmbedding(textToEmbed);
   }
 
-  // 4. Save to Database
+  // Save to Database
   const [updatedRows] = await Model.update(dbUpdate, { where: { usr_id } });
   
   return { updatedRows, dbUpdate };

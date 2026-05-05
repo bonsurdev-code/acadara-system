@@ -72,13 +72,13 @@ export default function MenteeSessions() {
 
   // State: No Mentorship Found
   if (!activeMatch) return (
-    <div className="p-20 text-center flex flex-col items-center justify-center min-h-[70vh]">
-      <div className="bg-slate-900 border border-slate-800 p-12 rounded-[3rem] shadow-2xl max-w-md">
+    <div className="p-4 sm:p-10 lg:p-20 text-center flex flex-col items-center justify-center min-h-[70vh]">
+      <div className="bg-slate-900 border border-slate-800 p-8 sm:p-12 rounded-[2rem] sm:rounded-[3rem] shadow-2xl w-full max-w-md">
         <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <Layout className="text-slate-500" size={32} />
         </div>
         <h2 className="text-white font-black text-2xl italic uppercase tracking-tighter">No Active Goals</h2>
-        <p className="text-slate-500 text-sm mt-3 mb-8">You don't have an active mentor right now. Start a new learning journey today.</p>
+        <p className="text-slate-500 text-sm mt-3 mb-8 px-2">You don't have an active mentor right now. Start a new learning journey today.</p>
         <button 
           onClick={() => window.location.href = '/mentee/find'}
           className="w-full py-4 bg-indigo-600 text-white font-black rounded-2xl text-[10px] uppercase tracking-widest hover:bg-indigo-500 transition-all flex items-center justify-center gap-2"

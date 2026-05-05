@@ -46,5 +46,10 @@ export const userService = {
   getMentorDashboard: async () => {
     const response = await apiClient.get('/user/dashboard/mentor');
     return response.data;
+  },
+
+  updateUserPassword: async (passwordData) => {
+    const response = await apiClient.put('/user/password', passwordData);
+    return response.data;
   }
 };

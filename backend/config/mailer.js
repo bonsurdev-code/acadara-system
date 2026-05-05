@@ -21,7 +21,7 @@ transporter.verify((error, success) => {
   }
 });
 
-export const sendCredentialsEmail = async (email, name, password) => {
+export const sendCredentialsEmail = async (email, acadara_email, name, password) => {
     const mailOptions = {
         from: `"Acadara Admin" <${process.env.EMAIL_USER}>`,
         to: email,
@@ -32,7 +32,7 @@ export const sendCredentialsEmail = async (email, name, password) => {
                 <p>Your application to join **Acadara** has been approved!</p>
                 <p>You can now log in using the credentials below:</p>
                 <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
-                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Email:</strong> ${acadara_email}</p>
                     <p><strong>Temporary Password:</strong> ${password}</p>
                 </div>
                 <p style="font-size: 12px; color: #666;">Please change your password immediately after logging in.</p>

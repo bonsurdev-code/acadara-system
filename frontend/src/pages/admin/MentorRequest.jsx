@@ -10,15 +10,22 @@ import {
   UserCheck, 
   Briefcase, 
   Mail, 
-  Loader2 
+  Loader2,
+  AlertCircle,
+  CheckCircle2
 } from "lucide-react";
+import { motion as Motion, AnimatePresence } from "framer-motion";
 
 export default function MentorRequest() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('pending'); // 'pending', 'approved', 'rejected'
+  const [filter, setFilter] = useState('pending');
+  
+  // Modal & Toast States
+  const [modalConfig, setModalConfig] = useState({ show: false, appId: null, status: null });
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  // Fetch applications based on current filter
   const fetchApplications = async () => {
     setLoading(true);
     try {
@@ -35,29 +42,99 @@ export default function MentorRequest() {
     fetchApplications();
   }, [filter]);
 
-  // Handle Approve/Reject
-  const handleStatusUpdate = async (appId, newStatus) => {
-    const confirmAction = window.confirm(`Are you sure you want to ${newStatus} this application?`);
-    if (!confirmAction) return;
+  const showToast = (message, type = 'success') => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast({ ...toast, show: false }), 4000);
+  };
 
+  const handleStatusUpdate = async () => {
+    const { appId, status } = modalConfig;
+    setIsUpdating(true);
     try {
-      await adminService.updateApplicationStatus(appId, newStatus);
+      await adminService.updateApplicationStatus(appId, status);
       
-      if (newStatus === 'approved') {
-        alert("Success! Mentor account created and credentials sent via email.");
-      } else {
-        alert("Application marked as rejected.");
-      }
+      const successMsg = status === 'approved' 
+        ? "Mentor approved! Account credentials have been dispatched." 
+        : "Application has been rejected.";
       
-      fetchApplications(); // Refresh the list
+      showToast(successMsg, status === 'approved' ? 'success' : 'info');
+      setModalConfig({ show: false, appId: null, status: null });
+      fetchApplications();
     } catch (err) {
-      console.error("Update failed:", err);
-      alert("Error: Could not update status.");
+      showToast("Operation failed. Please check connection.", "error");
+      console.error("Failed to update application status:", err);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 relative">
+      
+      {/* SUCCESS TOAST */}
+      <AnimatePresence>
+        {toast.show && (
+          <Motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="fixed top-10 right-10 z-[100] flex items-center gap-3 px-6 py-4 rounded-2xl glass border border-white/10 shadow-2xl"
+          >
+            <div className={`p-2 rounded-full ${toast.type === 'success' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-blue-500/20 text-blue-400'}`}>
+              <CheckCircle2 size={20} />
+            </div>
+            <p className="text-sm font-medium text-white">{toast.message}</p>
+          </Motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* CONFIRMATION MODAL */}
+      <AnimatePresence>
+        {modalConfig.show && (
+          <div className="fixed inset-0 z-90 flex items-center justify-center p-6">
+            <Motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setModalConfig({ show: false, appId: null, status: null })}
+              className="absolute inset-0 bg-[#020617]/80 backdrop-blur-sm"
+            />
+            <Motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-md bg-slate-900 border border-slate-700 p-8 rounded-4xl shadow-2xl"
+            >
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${modalConfig.status === 'approved' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
+                {modalConfig.status === 'approved' ? <Check size={32} /> : <AlertCircle size={32} />}
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2 capitalize">{modalConfig.status} Application?</h2>
+              <p className="text-slate-400 text-sm leading-relaxed mb-8">
+                {modalConfig.status === 'approved' 
+                  ? "This will create a mentor profile and send automated login credentials to the applicant's email address." 
+                  : "Are you sure you want to reject this applicant? They will be moved to the rejected archive."}
+              </p>
+              <div className="flex gap-3">
+                <button 
+                  disabled={isUpdating}
+                  onClick={() => setModalConfig({ show: false, appId: null, status: null })}
+                  className="flex-1 py-3 px-4 rounded-xl border border-slate-700 text-slate-300 font-bold hover:bg-slate-800 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  disabled={isUpdating}
+                  onClick={handleStatusUpdate}
+                  className={`flex-1 py-3 px-4 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 ${
+                    modalConfig.status === 'approved' ? 'bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/20' : 'bg-rose-600 hover:bg-rose-500 shadow-lg shadow-rose-600/20'
+                  }`}
+                >
+                  {isUpdating ? <Loader2 className="animate-spin" size={18} /> : "Confirm Action"}
+                </button>
+              </div>
+            </Motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -68,7 +145,6 @@ export default function MentorRequest() {
           <p className="text-slate-400 text-sm">Review and verify expert applications for Acadara.</p>
         </div>
         
-        {/* Filter Tabs */}
         <div className="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700">
           {['pending', 'approved', 'rejected'].map((status) => (
             <button 
@@ -129,7 +205,7 @@ export default function MentorRequest() {
                         </a>
                         {app.linkedin_url && (
                           <a href={app.linkedin_url} target="_blank" rel="noreferrer" className="text-xs text-slate-500 hover:text-blue-400 flex items-center gap-1 transition-colors">
-                            <ExternalLink size={12} /> LinkedIn
+                            <ExternalLink size={12} /> Social Url
                           </a>
                         )}
                       </div>
@@ -141,13 +217,13 @@ export default function MentorRequest() {
                     {filter === 'pending' && (
                       <>
                         <button 
-                          onClick={() => handleStatusUpdate(app.app_id, 'approved')}
+                          onClick={() => setModalConfig({ show: true, appId: app.app_id, status: 'approved' })}
                           className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600/10 text-emerald-400 border border-emerald-600/20 rounded-xl text-sm font-bold hover:bg-emerald-600 hover:text-white transition-all active:scale-95"
                         >
                           <Check size={18} /> Approve
                         </button>
                         <button 
-                          onClick={() => handleStatusUpdate(app.app_id, 'rejected')}
+                          onClick={() => setModalConfig({ show: true, appId: app.app_id, status: 'rejected' })}
                           className="p-2.5 bg-slate-900 text-slate-500 border border-slate-700 rounded-xl hover:bg-rose-500/10 hover:text-rose-500 transition-all active:scale-95"
                         >
                           <X size={20} />
@@ -155,9 +231,6 @@ export default function MentorRequest() {
                       </>
                     )}
                     
-                    <button className="p-2.5 bg-slate-900 text-slate-500 border border-slate-700 rounded-xl hover:bg-blue-500/10 hover:text-blue-400 transition-all">
-                      <MessageSquare size={20} />
-                    </button>
                   </div>
                 </div>
 
@@ -173,9 +246,6 @@ export default function MentorRequest() {
                     <span className="text-[10px] text-slate-600 flex items-center gap-1 uppercase tracking-wider font-bold">
                       <Clock size={12} /> Applied on {new Date(app.applied_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                     </span>
-                    <button className="text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-widest">
-                      Details Portfolio
-                    </button>
                   </div>
                 </div>
               </div>

@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../config/database.js'; // Note the .js extension
 
 const User = sequelize.define('User', {
-  usr_id: { type: DataTypes.STRING(10), primaryKey: true },
+  usr_id: { type: DataTypes.STRING(50), primaryKey: true },
   usr_name: { type: DataTypes.STRING(60), allowNull: false },
   usr_email: { type: DataTypes.STRING(60), unique: true, allowNull: false },
   usr_password: { type: DataTypes.STRING(60), allowNull: false },

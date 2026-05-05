@@ -99,6 +99,19 @@ export const useUserService = () => {
     return response;
   };
 
+  const updateUserPassword = async (passwordData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await userService.updateUserPassword(passwordData);
+      return response
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return { 
     updateProfile, 
@@ -111,6 +124,7 @@ export const useUserService = () => {
     unmatchPartners,
     getDashboardStats,
     getMentorDashboard,
+    updateUserPassword,
     loading, 
     error 
   };

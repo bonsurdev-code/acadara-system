@@ -15,4 +15,6 @@ router.route('/profile')
   .put(userController.updateProfile)
   .patch(userController.updateProfile);
 
+router.put('/password', userController.updateUserPassword);
+
 export default router;

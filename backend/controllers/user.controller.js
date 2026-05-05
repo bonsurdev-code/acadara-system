@@ -1,4 +1,5 @@
 import * as userService from '../services/user.service.js';
+import bcrypt from 'bcrypt';
 import { Match, Session, Rating, Mentee, Mentor, User, MentorApplications } from '../models/index.js';
 import { Sequelize } from 'sequelize';
 import { generateAppId } from '../utils/genId.js';
@@ -28,6 +29,27 @@ export const updateProfile = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const updateUserPassword = async (req, res) => {
+  try {
+    const { usr_id } = req.user;
+    const { oldPassword, newPassword } = req.body;
+
+    const user = await User.findByPk(usr_id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const validPass = await bcrypt.compare(oldPassword, user.usr_password);
+    if (!validPass) return res.status(401).json({ message: "Incorrect current password" });
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    await user.update({ usr_password: hashedNewPassword });
+
+    res.status(200).json({ success: true, message: "Password updated successfully" });
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 
 export const getDashboardStats = async (req, res) => {
   try {
@@ -142,7 +164,7 @@ export const getMentorDashboardData = async (req, res) => {
 
 export const submitApplication = async (req, res) => {
     try {
-        const { full_name, email, expertise, linkedin_url, bio } = req.body;
+        const { full_name, email, expertise, social_url, bio } = req.body;
 
         // Generate a temporary ID for the application record
         // This keeps your VARCHAR(10) requirement satisfied
@@ -153,7 +175,7 @@ export const submitApplication = async (req, res) => {
             full_name: full_name,
             email: email,
             expertise: expertise,
-            linkedin_url: linkedin_url,
+            linkedin_url: social_url,
             mentorship_bio: bio,
             status: 'pending'
         });
