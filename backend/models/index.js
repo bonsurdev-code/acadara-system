@@ -37,9 +37,6 @@ Rating.belongsTo(Mentee, { foreignKey: 'mentee_id', as: 'mentee' });
 Match.hasMany(Message, { foreignKey: 'match_id', as: 'messages' });
 Message.belongsTo(Match, { foreignKey: 'match_id', as: 'match' });
 
-MentorApplications.belongsTo(User, { foreignKey: 'usr_id', as: 'user' });
-User.hasMany(MentorApplications, { foreignKey: 'usr_id', as: 'applications' });
-
 export {
   sequelize,
   User,
