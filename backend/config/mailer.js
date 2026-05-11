@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export const sendCredentialsEmail = async (email, acadara_email, name, password) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Acadara <onboarding@resend.dev>', // Replace with your verified domain
+      from: 'Acadara <onboarding@resend.dev>',
       to: email,
       subject: '✨ Your Acadara Mentor Account is Ready!',
       html: `
