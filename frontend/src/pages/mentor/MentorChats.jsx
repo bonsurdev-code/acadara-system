@@ -13,36 +13,60 @@ export default function MentorChats() {
   const [inputText, setInputText] = useState("");
   const chatEndRef = useRef(null);
 
+  // Auto-scroll to latest message
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Initial load for contacts
   useEffect(() => {
     const init = async () => {
       const res = await getReceivedRequests();
       const accepted = res?.data?.filter(m => m.status === 'accepted') || [];
       setContacts(accepted);
-      // Auto-select on desktop only
       if (window.innerWidth > 768 && accepted.length > 0) setActiveContact(accepted[0]);
     };
     init();
   }, []);
 
+  /**
+   * POLLING FOR REAL-TIME UPDATES
+   * Refreshes chat data every 3 seconds
+   */
   useEffect(() => {
-    if (activeContact) fetchMessages(activeContact.match_id);
+    let intervalId;
+
+    if (activeContact) {
+      // Initial fetch when switching contacts
+      fetchMessages(activeContact.match_id);
+
+      // Setup interval
+      intervalId = setInterval(() => {
+        fetchMessages(activeContact.match_id);
+      }, 3000);
+    }
+
+    // Destroy timer on unmount or contact switch
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [activeContact, fetchMessages]);
 
   const handleSend = async (e) => {
     e.preventDefault();
     if (!inputText.trim() || !activeContact) return;
+    
     await sendMessage(activeContact.match_id, inputText);
     setInputText("");
+    
+    // Immediate fetch after sending for better UX
+    fetchMessages(activeContact.match_id);
   };
 
   return (
     <div className="flex h-[calc(100vh-80px)] md:h-[calc(100vh-120px)] max-w-7xl mx-auto bg-slate-950 md:border md:border-slate-800 md:rounded-[3rem] overflow-hidden shadow-2xl">
       
-      {/* SIDEBAR: CONTACTS */}
+      {/* SIDEBAR: CONTACTS (MENTEES) */}
       <div className={`
         ${activeContact ? 'hidden md:flex' : 'flex'} 
         w-full md:w-80 border-r border-slate-800 bg-slate-900/50 flex-col
@@ -100,7 +124,6 @@ export default function MentorChats() {
             {/* Messages Container */}
             <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
               {messages.map((msg, idx) => {
-                // FIX: Check against mentor_id since we are in MentorChats
                 const isMe = msg.sender_id === activeContact.mentor_id; 
                 
                 return (

@@ -13,23 +13,44 @@ export default function MenteeChats() {
   const [inputText, setInputText] = useState("");
   const chatEndRef = useRef(null);
 
+  // Scroll to bottom on new messages
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Initial load
   useEffect(() => {
     const init = async () => {
       const res = await getMyRequests();
       const accepted = res?.data?.filter(m => m.status === 'accepted') || [];
       setContacts(accepted);
-      // On desktop, auto-select first. On mobile, we might want to start with the list.
       if (window.innerWidth > 768 && accepted.length > 0) setActiveContact(accepted[0]);
     };
     init();
   }, []);
 
+  /**
+   * REAL-TIME UPDATE: Polling Logic
+   * Fetches messages every 3 seconds if a contact is selected
+   */
   useEffect(() => {
-    if (activeContact) fetchMessages(activeContact.match_id);
+    let intervalId;
+
+    if (activeContact) {
+      // Initial fetch when contact changes
+      fetchMessages(activeContact.match_id);
+
+      // Start the interval for real-time updates
+      intervalId = setInterval(() => {
+        // We use a "silent" fetch if possible, or just standard fetchMessages
+        fetchMessages(activeContact.match_id);
+      }, 3000); // 3000ms = 3 seconds
+    }
+
+    // CLEANUP: Stop polling when contact changes or component unmounts
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [activeContact, fetchMessages]);
 
   const handleSend = async (e) => {
@@ -37,14 +58,14 @@ export default function MenteeChats() {
     if (!inputText.trim() || !activeContact) return;
     await sendMessage(activeContact.match_id, inputText);
     setInputText("");
+    // Optional: Immediately fetch to show your own message without waiting for poll
+    fetchMessages(activeContact.match_id);
   };
 
   return (
-    /* Responsive container: Full screen on mobile, capped on desktop */
     <div className="flex h-[calc(100vh-80px)] md:h-[calc(100vh-120px)] max-w-7xl mx-auto bg-slate-950 md:border md:border-slate-800 md:rounded-[3rem] overflow-hidden shadow-2xl">
       
       {/* SIDEBAR: CONTACTS */}
-      {/* Hidden on mobile if a contact is active */}
       <div className={`
         ${activeContact ? 'hidden md:flex' : 'flex'} 
         w-full md:w-80 border-r border-slate-800 bg-slate-900/50 flex-col
@@ -77,7 +98,6 @@ export default function MenteeChats() {
       </div>
 
       {/* CHAT AREA */}
-      {/* Hidden on mobile if NO contact is active */}
       <div className={`
         ${!activeContact ? 'hidden md:flex' : 'flex'} 
         flex-1 flex flex-col bg-slate-950 relative
@@ -87,7 +107,6 @@ export default function MenteeChats() {
             {/* Header */}
             <div className="p-4 md:px-8 border-b border-slate-800 flex justify-between items-center bg-slate-900/30">
               <div className="flex items-center gap-3">
-                {/* Back Button for Mobile */}
                 <button 
                   onClick={() => setActiveContact(null)} 
                   className="md:hidden p-2 -ml-2 text-slate-400 hover:text-white"
@@ -108,6 +127,7 @@ export default function MenteeChats() {
             {/* Messages Container */}
             <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
               {messages.map((msg, idx) => {
+                // Ensure ID comparison matches your token structure (mentee_id vs sender_id)
                 const isMe = msg.sender_id === activeContact.mentee_id;
                 return (
                   <div key={idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
@@ -141,7 +161,6 @@ export default function MenteeChats() {
             </form>
           </>
         ) : (
-          /* Empty State for Desktop */
           <div className="hidden md:flex flex-1 flex-col items-center justify-center opacity-20">
             <MessageSquare size={80} className="mb-4" />
             <p className="font-black italic uppercase tracking-widest">Select a session to start chatting</p>
