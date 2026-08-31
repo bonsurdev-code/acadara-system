@@ -1,8 +1,7 @@
-import { User, Mentor, Mentee, Match, Session, Rating, MentorApplications } from '../models/index.js';
-import { sendCredentialsEmail } from '../config/mailer.js';
+import { User, Mentor, Mentee, Match, Session, MentorApplications } from '../models/index.js';
+import { sendMentorWelcomeEmail } from '../services/email.service.js';
 import { generateUserId } from '../utils/genId.js';
 import bcrypt from 'bcrypt';
-import { Op } from 'sequelize';
 
 export const getDashboardStats = async (req, res) => {
     try {
@@ -107,7 +106,12 @@ export const updateApplicationStatus = async (req, res) => {
             }, { where: { usr_id: newUsrId } });
 
             // 3. SEND EMAIL AUTOMATICALLY
-            await sendCredentialsEmail(application.email, acadara_email, application.full_name, rawPassword);
+            await sendMentorWelcomeEmail({
+                to: application.email,
+                name: application.full_name,
+                acadara_email: acadara_email,
+                password: rawPassword
+            });
         }
 
         await application.update({ status, reviewed_at: new Date() });

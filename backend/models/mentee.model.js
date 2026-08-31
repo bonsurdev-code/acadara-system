@@ -2,8 +2,8 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../config/database.js';
 
 const Mentee = sequelize.define('Mentee', {
-  mentee_id: { type: DataTypes.STRING(10), primaryKey: true },
-  usr_id: { type: DataTypes.STRING(10), allowNull: false },
+  mentee_id: { type: DataTypes.STRING(50), primaryKey: true },
+  usr_id: { type: DataTypes.STRING(50), allowNull: false },
   mentee_subject: DataTypes.STRING(60),
   mentee_description: DataTypes.TEXT,
   mentee_lvl: DataTypes.ENUM('beginner', 'intermediate', 'advanced'),
