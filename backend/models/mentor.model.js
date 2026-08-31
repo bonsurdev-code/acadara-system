@@ -7,7 +7,7 @@ const Mentor = sequelize.define('Mentor', {
   mentor_subject: DataTypes.STRING(60),
   mentor_topics: DataTypes.TEXT,
   mentor_experience: DataTypes.STRING(60),
-  mentor_availability: DataTypes.RANGE(DataTypes.DATE),
+  mentor_availability: DataTypes.RANGE(DataTypes.DATEONLY),
   mentor_embedding: {
     type: DataTypes.JSONB, 
     allowNull: true
