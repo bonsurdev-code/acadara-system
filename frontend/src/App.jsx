@@ -10,6 +10,10 @@ import ErrorPageComponent from "./components/ErrorPageComponent";
 // Pages
 import LandingPage from "./pages/LandingPage";
 import MentorOnboarding from "./pages/MentorOnBoarding";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import CookiePolicy from "./pages/CookiePolicy";
+
 import MenteeDashboard from "./pages/mentee/MenteeDashboard";
 import FindMentors from "./pages/mentee/FindMentors";
 import MentorRequests from "./pages/mentee/MentorRequests";
@@ -34,6 +38,9 @@ export default function App() {
         {/* Public Route - No Auth Guard */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/onboarding" element={<MentorOnboarding />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/cookie-policy" element={<CookiePolicy />} />
 
         {/* Mentee Portal */}
         <Route path="/mentee/*" element={

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion as Motion, AnimatePresence } from 'framer-motion'
 import { 
   Brain, 
@@ -164,11 +165,28 @@ export default function LandingPage(){
     // ]
 
     const links = {
-        Product: ['Features', 'How It Works', 'Pricing', 'API', 'Security'],
-        Company: ['About', 'Blog', 'Careers', 'Press', 'Partners'],
-        Resources: ['Documentation', 'Help Center', 'Community', 'Templates', 'Webinars'],
-        Legal: ['Privacy', 'Terms', 'Cookie Policy', 'Licenses']
+        Product: [
+            { name: 'Features', href: '#features' },
+            { name: 'Mentors', href: '#mentors' },
+            { name: 'AI Matching', href: '#ai-matching' },
+            { name: 'FAQ', href: '#faq' },
+        ],
+        Resources: [
+            { name: 'SPECS Community', href: 'https://www.facebook.com/gcccsSPECS' },
+            { name: 'Gordon College', href: 'https://gordoncollege.edu.ph' },
+        ],
+        Legal: [
+            { name: 'Privacy Policy', href: '/privacy-policy' },
+            { name: 'Terms of Service', href: '/terms-of-service' },
+            { name: 'Cookie Policy', href: '/cookie-policy' },
+        ],
     }
+    const socialLinks = [
+        { name: 'Facebook', href: 'https://facebook.com', icon: 'F' },
+        { name: 'Instagram', href: 'https://instagram.com', icon: 'I' },
+        { name: 'GitHub', href: 'https://github.com', icon: 'G' },
+        { name: 'Discord', href: 'https://discord.com', icon: 'D' },
+    ]
 
     return (
         <div className="min-h-screen bg-[#0F172A] text-white font-sans selection:bg-blue-500/30">
@@ -289,7 +307,7 @@ export default function LandingPage(){
                             onClick={openSignup}
                             className="px-8 py-4 rounded-full bg-linear-to-r from-blue-600 to-violet-600 text-white font-semibold text-lg hover:shadow-2xl hover:shadow-blue-500/25 transition-all flex items-center gap-2 group"
                         >
-                            Start Your Journey
+                            Start Your Mentee Journey
                             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </Motion.button>
                         <Motion.button
@@ -298,7 +316,7 @@ export default function LandingPage(){
                             onClick={() => window.location.href = "/onboarding"}
                             className="px-8 py-4 rounded-full glass text-white font-semibold text-lg hover:bg-slate-800/50 transition-all border border-slate-700"
                         >
-                            Become a Mentor
+                            Become an Acadara Mentor
                         </Motion.button>
                         </Motion.div>
 
@@ -552,46 +570,67 @@ export default function LandingPage(){
                             Revolutionizing mentorship through AI-powered semantic matching. Connecting the right minds for exponential growth.
                             </p>
                             <div className="flex gap-4">
-                            {['Twitter', 'LinkedIn', 'GitHub', 'Discord'].map((social) => (
-                                <a
-                                key={social}
-                                href="#"
-                                className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-all"
-                                >
-                                <span className="text-xs font-bold">{social[0]}</span>
-                                </a>
-                            ))}
+                                {socialLinks.map((social) => (
+                                    <a
+                                    key={social.name}
+                                    href={social.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label={social.name}
+                                    className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-all"
+                                    >
+                                    <span className="text-xs font-bold">{social.icon}</span>
+                                    </a>
+                                ))}
                             </div>
                         </div>
-                        
+
                         {Object.entries(links).map(([category, items]) => (
                             <div key={category}>
                             <h4 className="text-white font-semibold mb-4">{category}</h4>
                             <ul className="space-y-3">
                                 {items.map((item) => (
-                                <li key={item}>
-                                    <a href="#" className="text-slate-400 hover:text-blue-400 transition-colors text-sm">
-                                    {item}
+                                <li key={item.name}>
+                                    {item.href.startsWith('/') ? (
+                                    <Link
+                                        to={item.href}
+                                        className="text-slate-400 hover:text-blue-400 transition-colors text-sm"
+                                    >
+                                        {item.name}
+                                    </Link>
+                                    ) : (
+                                    <a
+                                        href={item.href}
+                                        className="text-slate-400 hover:text-blue-400 transition-colors text-sm"
+                                    >
+                                        {item.name}
                                     </a>
+                                    )}
                                 </li>
                                 ))}
                             </ul>
                             </div>
                         ))}
                         </div>
-                        
+
                         <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                         <p className="text-slate-500 text-sm">
-                            © 2025 Acadara. All rights reserved.
+                            © 2026 Acadara. All rights reserved.
                         </p>
                         <div className="flex items-center gap-6">
-                            <a href="#" className="text-slate-500 hover:text-white text-sm transition-colors">Privacy Policy</a>
-                            <a href="#" className="text-slate-500 hover:text-white text-sm transition-colors">Terms of Service</a>
-                            <a href="#" className="text-slate-500 hover:text-white text-sm transition-colors">Cookies</a>
+                            <Link to="/privacy-policy" className="text-slate-500 hover:text-white text-sm transition-colors">
+                            Privacy Policy
+                            </Link>
+                            <Link to="/terms-of-service" className="text-slate-500 hover:text-white text-sm transition-colors">
+                            Terms of Service
+                            </Link>
+                            <Link to="/cookie-policy" className="text-slate-500 hover:text-white text-sm transition-colors">
+                            Cookies
+                            </Link>
                         </div>
                         </div>
                     </div>
-                </footer>
+                    </footer>
             <LoginModal
                 isOpen={isLoginOpen} 
                 onClose={() => setIsLoginOpen(false)}
