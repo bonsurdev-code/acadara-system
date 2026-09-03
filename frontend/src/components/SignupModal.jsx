@@ -39,25 +39,33 @@ export default function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
     try {
       await register(payload);
       setRegisteredEmail(payload.usr_email);
+      setError(null);
       setStep('otp');
     } catch (err) {
-      // Intercept unverified email registration attempts
-      if (err.response?.data?.is_unverified) {
+      // Check backend payload structure directly from Axios response
+      const resData = err.response?.data;
+
+      if (resData?.is_unverified) {
+        // 1. UNVERIFIED USER: Navigate to OTP step
         const email = payload.usr_email;
         setRegisteredEmail(email);
         setStep('otp');
         
-        // Display backend error/warning message directly inside OTP modal
         const message =
-          err.response?.data?.message ||
+          resData?.message ||
           'Email is already registered but unverified. Please enter your OTP.';
         setOtpNotice(message);
 
-        // Clear global hook error so it doesn't leak back to signup step
+        // Clear global error so it doesn't leak red banner into OTP view
         setError(null);
 
-        // Automatically send a fresh OTP to the user's inbox
+        // Trigger OTP resend silently without letting errors mutate state
         resendOTP({ usr_email: email }).catch(() => {});
+      } else {
+        // 2. VERIFIED USER OR OTHER ERROR: Stay on 'signup' step
+        setStep('signup');
+        setOtpNotice('');
+        // Global hook error set inside AuthProvider will display on Signup form
       }
     }
   };
@@ -70,18 +78,19 @@ export default function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
       handleClose();
       window.location.reload();
     } catch {
-      // Error state handled inside useAuth
+      // Error state handled inside useAuth hook
     }
   };
 
   const handleResend = async () => {
     setResending(true);
     setResendMsg('');
+    setError(null);
     try {
       const res = await resendOTP({ usr_email: registeredEmail });
-      setResendMsg(res.message || 'Verification code resent!');
+      setResendMsg(res?.message || 'Verification code resent!');
     } catch {
-      // Error state handled inside useAuth
+      // Error state handled inside useAuth hook
     } finally {
       setResending(false);
     }
@@ -92,7 +101,6 @@ export default function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
       isOpen={isOpen} 
       onClose={handleClose} 
       title={step === 'signup' ? "Create Your Mentee Account" : "Verify Your Email"}
-      disableBackdropClose={true} // Prevents modal from closing when clicking outside
     >
       {step === 'signup' ? (
         <form onSubmit={handleSignupSubmit} className="space-y-5">

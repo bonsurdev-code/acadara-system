@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
         'Registration failed';
       
       setError(msg);
-      throw error;
+      throw error; // Preserve raw Axios error with response data
     } finally {
       setLoading(false);
     }

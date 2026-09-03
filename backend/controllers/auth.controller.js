@@ -17,7 +17,8 @@ export const register = async (req, res) => {
     }
     const existingUser = await User.findOne({ where: { usr_email } });
     if (existingUser) {
-      if (!existingUser.is_verified) {
+      // FIX: Use usr_is_verified instead of is_verified
+      if (!existingUser.usr_is_verified) {
         return res.status(400).json({
           message: 'Email registered but not verified. Please verify your OTP.',
           is_unverified: true,
