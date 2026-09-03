@@ -4,6 +4,7 @@ import { useAuth } from '../../core/api-hooks/useAuth';
 import { useUserService } from '../../core/api-hooks/useUserService';
 import { getInitials } from '../../utils/getInitials';
 import { useNavigate } from 'react-router-dom';
+import ProfileModal from '../../components/ProfileModal'; // 1. Import ProfileModal
 
 export default function FindMentors() {
   const { user } = useAuth();
@@ -12,6 +13,9 @@ export default function FindMentors() {
   const [mentors, setMentors] = useState([]);
   const [hasMatched, setHasMatched] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState(null);
+  
+  // 2. Add state to toggle the Profile Modal
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   // --- 1. HANDLE REQUESTED STATE ---
   if (user?.hasRequested) {
@@ -69,6 +73,12 @@ export default function FindMentors() {
 
   // --- 3. THE NORMAL MATCHING FLOW ---
   const handleStartMatching = async () => {
+    // 3. Validation Check: Open modal if essential profile fields are missing
+    if (!user?.subject || !user?.description || !user?.availability) {
+      setIsProfileModalOpen(true);
+      return;
+    }
+
     try {
       const payload = {
         subject: user?.subject,
@@ -193,13 +203,18 @@ export default function FindMentors() {
           </div>
         </div>
       )}
+
+      {/* 4. Render ProfileModal */}
+      <ProfileModal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)} 
+        noticeMessage="Please complete your profile details (subject, learning goals, and availability) before running the AI matching system."
+      />
     </div>
   );
 }
 
-
 function MentorCard({ match , onRequest }) {
-  // Extracting data from the match object (populated via your Sequelize include)
   const mentor = match.Mentor;
   const userData = mentor?.user;
   const score = (match.similarity_score * 100).toFixed(1);
@@ -233,7 +248,7 @@ function MentorCard({ match , onRequest }) {
           <span className="text-xs">Availability Set</span>
         </div>
         <button 
-          onClick={onRequest} // Call the modal opener
+          onClick={onRequest}
           className="flex items-center gap-2 text-xs font-bold text-emerald-500 hover:text-emerald-400 transition-colors group/btn"
         >
           Request Mentorship <Send size={14} className="group-hover/btn:translate-x-1 transition-transform" />

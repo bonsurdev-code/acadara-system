@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Save, CheckCircle2, Book, Calendar, Star } from 'lucide-react';
+import { Save, CheckCircle2, Book, Calendar, Star, AlertCircle } from 'lucide-react'; // Added AlertCircle
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import '../assets/datepicker-custom.css';
@@ -10,17 +10,14 @@ import { formatToPostgresRange, parsePostgresRange } from '../utils/dateUtils';
 import { useAuth } from '../core/api-hooks/useAuth';
 import { useUserService } from '../core/api-hooks/useUserService';
 
-export default function ProfileModal({ isOpen, onClose }) {
+export default function ProfileModal({ isOpen, onClose, noticeMessage }) { // 1. Added noticeMessage prop
   const { user } = useAuth();
   const { updateProfile, loading: isSaving } = useUserService();
   
-  // 1. Theme Configuration
   const isMentor = user?.usr_role === 'mentor';
   const themeColor = isMentor ? 'indigo' : 'emerald';
   const accentClass = isMentor ? 'border-indigo-500/50' : 'border-emerald-500/50';
 
-  // 2. State Initialization (Prevents Cascading Renders)
-  // const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   
   const [formData, setFormData] = useState(() => ({
@@ -38,12 +35,10 @@ export default function ProfileModal({ isOpen, onClose }) {
   
   const [startDate, endDate] = dateRange;
 
-  // 3. Handlers
   const handleSave = async () => {
     try {
       const postgresRange = formatToPostgresRange(startDate, endDate);
       
-      // Create an object with all current form values
       const currentData = {
         subject: formData.subject,
         [isMentor ? 'topics' : 'description']: isMentor ? formData.topics : formData.description,
@@ -51,22 +46,18 @@ export default function ProfileModal({ isOpen, onClose }) {
         availability: postgresRange
       };
 
-      // Filter to find ONLY changed fields (Partial Logic)
       const patchData = {};
       Object.keys(currentData).forEach(key => {
-        // Compare current input with the original user data from AuthContext
         if (currentData[key] !== user[key]) {
           patchData[key] = currentData[key];
         }
       });
 
-      // If nothing changed, just close the modal
       if (Object.keys(patchData).length === 0) {
         onClose();
         return;
       }
 
-      // Call updateProfile with isPartial = true
       await updateProfile(patchData, true); 
       
       setShowSuccess(true);
@@ -83,6 +74,14 @@ export default function ProfileModal({ isOpen, onClose }) {
     <BaseModal isOpen={isOpen} onClose={onClose} title="Edit Profile">
       <div className="space-y-6">
         
+        {/* 2. Notice Banner (Only renders when noticeMessage is passed) */}
+        {noticeMessage && (
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-medium">
+            <AlertCircle size={18} className="shrink-0 text-amber-400" />
+            <span>{noticeMessage}</span>
+          </div>
+        )}
+
         {/* Profile Header */}
         <div className={`relative overflow-hidden p-6 rounded-2xl border ${accentClass} bg-slate-800/40 backdrop-blur-sm`}>
           <div className="flex items-center gap-5 relative z-10">
@@ -118,6 +117,7 @@ export default function ProfileModal({ isOpen, onClose }) {
             </label>
             <textarea 
               value={isMentor ? formData.topics : formData.description}
+              placeholder={isMentor ? 'e.g. Graph Algorithms, Dynamic Programming' : 'e.g. Improve problem-solving skills'}
               onChange={(e) => setFormData(prev => ({...prev, [isMentor ? 'topics' : 'description']: e.target.value}))}
               className={`w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-${themeColor}-500 outline-none h-24 resize-none transition-all`}
             />
@@ -135,6 +135,7 @@ export default function ProfileModal({ isOpen, onClose }) {
                   value={formData.experience}
                   onChange={(e) => setFormData(prev => ({...prev, experience: e.target.value}))}
                   className="w-full bg-slate-950/50 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-200 focus:border-indigo-500 outline-none"
+                  placeholder="e.g. 5 years"
                 />
               ) : (
                 <select 
@@ -158,6 +159,7 @@ export default function ProfileModal({ isOpen, onClose }) {
                 selectsRange
                 startDate={startDate}
                 endDate={endDate}
+                placeholderText="Select availability range"
                 onChange={(update) => setDateRange(update)}
                 className={`w-full bg-slate-950/50 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-200 focus:border-${themeColor}-500 outline-none`}
               />
@@ -181,7 +183,6 @@ export default function ProfileModal({ isOpen, onClose }) {
   );
 }
 
-// Sub-component to clean up the main JSX
 function FormInput({ label, icon, value, onChange, placeholder, themeColor, fullWidth }) {
   return (
     <div className={`${fullWidth ? 'md:col-span-2' : ''} space-y-1.5`}>

@@ -33,7 +33,7 @@ export default function SettingsModal({ isOpen, onClose, role }) {
       <div className="space-y-6">
         
         {/* Notifications Toggle */}
-        <div className="flex items-center justify-between p-4 bg-slate-800/30 rounded-2xl border border-slate-800 group hover:border-slate-700 transition-colors">
+        {/* <div className="flex items-center justify-between p-4 bg-slate-800/30 rounded-2xl border border-slate-800 group hover:border-slate-700 transition-colors">
           <div className="flex items-center gap-4">
             <div className={`p-2 rounded-lg ${notifications ? 'bg-indigo-500/10 text-indigo-400' : 'bg-slate-700 text-slate-500'}`}>
               <Bell size={20} />
@@ -58,7 +58,6 @@ export default function SettingsModal({ isOpen, onClose, role }) {
           </label>
         </div>
 
-        {/* Theme Selection */}
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Interface Mode</span>
@@ -90,7 +89,6 @@ export default function SettingsModal({ isOpen, onClose, role }) {
           </div>
         </div>
 
-        {/* Action Button */}
         <button 
           onClick={handleSave} 
           disabled={isSaving || saved}
@@ -110,7 +108,8 @@ export default function SettingsModal({ isOpen, onClose, role }) {
           ) : (
             'Save Changes'
           )}
-        </button>
+        </button> */}
+        <h1 className="text-xl font-bold text-slate-300">Under Development :]</h1>
       </div>
     </BaseModal>
   );
