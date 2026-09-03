@@ -16,9 +16,9 @@ router.post('/oauth/google', (req, res) => {
   oauthLogin(req, res);
 });
 
-router.post('/oauth/facebook', (req, res) => {
-  req.body.provider = "facebook";
-  oauthLogin(req, res);
-});
+// router.post('/oauth/facebook', (req, res) => {
+//   req.body.provider = "facebook";
+//   oauthLogin(req, res);
+// });
 
 export default router;

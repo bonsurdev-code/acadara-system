@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Save, CheckCircle2, Book, Calendar, Star, AlertCircle } from 'lucide-react'; // Added AlertCircle
+import { Save, CheckCircle2, Book, Calendar, Star, AlertCircle } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import '../assets/datepicker-custom.css';
@@ -10,7 +10,7 @@ import { formatToPostgresRange, parsePostgresRange } from '../utils/dateUtils';
 import { useAuth } from '../core/api-hooks/useAuth';
 import { useUserService } from '../core/api-hooks/useUserService';
 
-export default function ProfileModal({ isOpen, onClose, noticeMessage }) { // 1. Added noticeMessage prop
+export default function ProfileModal({ isOpen, onClose, noticeMessage }) {
   const { user } = useAuth();
   const { updateProfile, loading: isSaving } = useUserService();
   
@@ -71,27 +71,32 @@ export default function ProfileModal({ isOpen, onClose, noticeMessage }) { // 1.
   };
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} title="Edit Profile">
-      <div className="space-y-6">
+    <BaseModal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      title="Edit Profile"
+      maxWidth={noticeMessage ? "max-w-2xl" : "max-w-xl"} // Dynamic width: expands when noticeMessage is present
+    >
+      <div className="space-y-4 sm:space-y-6">
         
-        {/* 2. Notice Banner (Only renders when noticeMessage is passed) */}
+        {/* Notice Banner */}
         {noticeMessage && (
-          <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-medium">
-            <AlertCircle size={18} className="shrink-0 text-amber-400" />
+          <div className="flex items-start sm:items-center gap-3 p-3.5 sm:p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs sm:text-sm font-medium leading-relaxed">
+            <AlertCircle size={18} className="shrink-0 text-amber-400 mt-0.5 sm:mt-0" />
             <span>{noticeMessage}</span>
           </div>
         )}
 
         {/* Profile Header */}
-        <div className={`relative overflow-hidden p-6 rounded-2xl border ${accentClass} bg-slate-800/40 backdrop-blur-sm`}>
-          <div className="flex items-center gap-5 relative z-10">
-            <div className={`w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-black text-white shadow-2xl bg-linear-to-br ${isMentor ? 'from-indigo-500 to-purple-600' : 'from-emerald-500 to-teal-600'}`}>
+        <div className={`relative overflow-hidden p-4 sm:p-6 rounded-2xl border ${accentClass} bg-slate-800/40 backdrop-blur-sm`}>
+          <div className="flex items-center gap-3.5 sm:gap-5 relative z-10">
+            <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center text-lg sm:text-2xl font-black text-white shadow-2xl bg-linear-to-br ${isMentor ? 'from-indigo-500 to-purple-600' : 'from-emerald-500 to-teal-600'} shrink-0`}>
               {getInitials(user?.usr_name)}
             </div>
-            <div>
-              <h3 className="text-xl font-bold text-white">{user?.usr_name}</h3>
-              <p className="text-slate-400 text-sm">{user?.usr_email}</p>
-              <div className={`mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-${themeColor}-500/10 text-${themeColor}-400 border border-${themeColor}-500/20`}>
+            <div className="min-w-0">
+              <h3 className="text-lg sm:text-xl font-bold text-white truncate">{user?.usr_name}</h3>
+              <p className="text-slate-400 text-xs sm:text-sm truncate">{user?.usr_email}</p>
+              <div className={`mt-1.5 sm:mt-2 inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-${themeColor}-500/10 text-${themeColor}-400 border border-${themeColor}-500/20`}>
                 {user?.usr_role} Account
               </div>
             </div>
@@ -99,8 +104,8 @@ export default function ProfileModal({ isOpen, onClose, noticeMessage }) { // 1.
           <div className={`absolute -right-10 -top-10 w-32 h-32 blur-3xl opacity-20 bg-${themeColor}-500`} />
         </div>
 
-        {/* Inputs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Inputs Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <FormInput 
             label={isMentor ? 'Primary Expertise' : 'Current Subject'}
             icon={<Book size={16} />}
@@ -111,7 +116,7 @@ export default function ProfileModal({ isOpen, onClose, noticeMessage }) { // 1.
             fullWidth
           />
 
-          <div className="md:col-span-2 space-y-1.5">
+          <div className="sm:col-span-2 space-y-1.5">
             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
               {isMentor ? 'Specific Topics Covered' : 'Learning Goals'}
             </label>
@@ -119,7 +124,7 @@ export default function ProfileModal({ isOpen, onClose, noticeMessage }) { // 1.
               value={isMentor ? formData.topics : formData.description}
               placeholder={isMentor ? 'e.g. Graph Algorithms, Dynamic Programming' : 'e.g. Improve problem-solving skills'}
               onChange={(e) => setFormData(prev => ({...prev, [isMentor ? 'topics' : 'description']: e.target.value}))}
-              className={`w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-${themeColor}-500 outline-none h-24 resize-none transition-all`}
+              className={`w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-2.5 sm:py-3 text-sm text-slate-200 focus:border-${themeColor}-500 outline-none ${noticeMessage ? 'h-20 sm:h-24' : 'h-24'} resize-none transition-all`}
             />
           </div>
 
@@ -134,14 +139,14 @@ export default function ProfileModal({ isOpen, onClose, noticeMessage }) { // 1.
                   type="text" 
                   value={formData.experience}
                   onChange={(e) => setFormData(prev => ({...prev, experience: e.target.value}))}
-                  className="w-full bg-slate-950/50 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-200 focus:border-indigo-500 outline-none"
+                  className="w-full bg-slate-950/50 border border-slate-800 rounded-xl pl-11 pr-4 py-2.5 sm:py-3 text-sm text-slate-200 focus:border-indigo-500 outline-none"
                   placeholder="e.g. 5 years"
                 />
               ) : (
                 <select 
                   value={formData.lvl}
                   onChange={(e) => setFormData(prev => ({...prev, lvl: e.target.value}))}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-200 focus:border-emerald-500 outline-none appearance-none"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-11 pr-4 py-2.5 sm:py-3 text-sm text-slate-200 focus:border-emerald-500 outline-none appearance-none"
                 >
                   <option value="beginner">Beginner</option>
                   <option value="intermediate">Intermediate</option>
@@ -161,7 +166,7 @@ export default function ProfileModal({ isOpen, onClose, noticeMessage }) { // 1.
                 endDate={endDate}
                 placeholderText="Select availability range"
                 onChange={(update) => setDateRange(update)}
-                className={`w-full bg-slate-950/50 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-200 focus:border-${themeColor}-500 outline-none`}
+                className={`w-full bg-slate-950/50 border border-slate-800 rounded-xl pl-11 pr-4 py-2.5 sm:py-3 text-sm text-slate-200 focus:border-${themeColor}-500 outline-none`}
               />
             </div>
           </div>
@@ -171,7 +176,7 @@ export default function ProfileModal({ isOpen, onClose, noticeMessage }) { // 1.
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className={`w-full group relative flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-white transition-all 
+          className={`w-full group relative flex items-center justify-center gap-2 py-3.5 sm:py-4 rounded-2xl font-bold text-sm sm:text-base text-white transition-all 
             ${showSuccess ? 'bg-blue-600' : isMentor ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-emerald-600 hover:bg-emerald-500'}`}
         >
           {isSaving ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> 
@@ -185,7 +190,7 @@ export default function ProfileModal({ isOpen, onClose, noticeMessage }) { // 1.
 
 function FormInput({ label, icon, value, onChange, placeholder, themeColor, fullWidth }) {
   return (
-    <div className={`${fullWidth ? 'md:col-span-2' : ''} space-y-1.5`}>
+    <div className={`${fullWidth ? 'sm:col-span-2' : ''} space-y-1.5`}>
       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{label}</label>
       <div className="relative">
         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">{icon}</div>
@@ -194,7 +199,7 @@ function FormInput({ label, icon, value, onChange, placeholder, themeColor, full
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className={`w-full bg-slate-950/50 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-200 focus:border-${themeColor}-500 outline-none transition-all`}
+          className={`w-full bg-slate-950/50 border border-slate-800 rounded-xl pl-11 pr-4 py-2.5 sm:py-3 text-sm text-slate-200 focus:border-${themeColor}-500 outline-none transition-all`}
         />
       </div>
     </div>

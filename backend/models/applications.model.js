@@ -8,7 +8,7 @@ const MentorApplications = sequelize.define('MentorApplications', {
         primaryKey: true
     },
     usr_id: {
-        type: DataTypes.STRING(10),
+        type: DataTypes.STRING(50),
         allowNull: true,
     },
     full_name: {

@@ -8,12 +8,12 @@ const Match = sequelize.define('Match', {
     primaryKey: true
   },
   mentee_id: {
-    type: DataTypes.STRING(10),
+    type: DataTypes.STRING(50),
     allowNull: false,
     references: { model: 'mentees', key: 'mentee_id' }
   },
   mentor_id: {
-    type: DataTypes.STRING(10),
+    type: DataTypes.STRING(50),
     allowNull: false,
     references: { model: 'mentors', key: 'mentor_id' }
   },

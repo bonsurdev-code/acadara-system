@@ -158,13 +158,13 @@ export default function MentorOnboarding() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-400">About your Mentorship Style</label>
+                  <label className="text-sm font-medium text-slate-400">What can you offer/teach your mentees?</label>
                   <textarea 
                     required
                     rows="3"
                     value={formData.bio}
                     className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none resize-none transition-colors" 
-                    placeholder="How do you help your mentees grow?"
+                    placeholder="What unique value do you bring to your mentees?"
                     onChange={(e) => setFormData({...formData, bio: e.target.value})}
                   />
                 </div>

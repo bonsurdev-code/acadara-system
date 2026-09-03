@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import validator from 'validator';
 import { User } from '../models/index.js';
-import { verifyGoogleToken, verifyFacebookToken } from '../services/oauth.service.js';
+import { verifyGoogleToken } from '../services/oauth.service.js';
 import { sendOTPEmail } from '../services/email.service.js';
 
 export const register = async (req, res) => {
@@ -175,13 +175,11 @@ export const oauthLogin = async (req, res) => {
 
     if (provider === "google") {
       profile = await verifyGoogleToken(token);
-    } else if (provider === "facebook") {
-      profile = await verifyFacebookToken(token);
     } else {
       return res.status(400).json({ message: "Invalid provider" });
     }
 
-    const { email, name, provider_id, avatar } = profile;
+    const { email, name, provider_id } = profile;
 
     // 1. Find user by provider OR email
     let user = await User.findOne({

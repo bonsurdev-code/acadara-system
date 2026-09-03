@@ -85,27 +85,38 @@ export const updateApplicationStatus = async (req, res) => {
         const { status } = req.body;
         const application = await MentorApplications.findByPk(id);
 
+        if (!application) {
+            return res.status(404).json({ success: false, message: "Application not found" });
+        }
+
         if (status === 'approved' && application.status !== 'approved') {
-            const newUsrId = generateUserId();
+            const newUsrId = generateUserId(); // e.g., USR-123456
             const rawPassword = 'Acadara2026!';
             const hashedPassword = await bcrypt.hash(rawPassword, 10);
             const acadara_email = application.email.split('@')[0] + '@acadara.com';
+
             // 1. Create User
             await User.create({
                 usr_id: newUsrId,
                 usr_name: application.full_name,
                 usr_email: acadara_email,
                 usr_password: hashedPassword,
-                usr_role: 'mentor'
+                usr_role: 'mentor',
+                usr_is_verified: true
             });
 
-            // 2. Update Mentor Profile (subject/expertise)
-            await Mentor.update({
+            // 2. Create Mentor Profile (use .create(), not .update())
+            await Mentor.create({
+                mentor_id: `MTR-${newUsrId}`,
+                usr_id: newUsrId,
                 mentor_subject: application.expertise,
                 mentor_topics: application.mentorship_bio
-            }, { where: { usr_id: newUsrId } });
+            });
 
-            // 3. SEND EMAIL AUTOMATICALLY
+            // 3. Link the new user ID to the application record
+            application.usr_id = newUsrId;
+
+            // 4. Send Welcome Email
             await sendMentorWelcomeEmail({
                 to: application.email,
                 name: application.full_name,
@@ -114,11 +125,13 @@ export const updateApplicationStatus = async (req, res) => {
             });
         }
 
-        await application.update({ status, reviewed_at: new Date() });
+        application.status = status;
+        application.reviewed_at = new Date();
+        await application.save();
 
-        res.json({ success: true, message: `Application ${status} and email sent.` });
+        res.json({ success: true, message: `Application ${status} processed successfully.` });
     } catch (error) {
-        console.error(error);
+        console.error("Approval error:", error);
         res.status(500).json({ success: false, message: "Error processing approval" });
     }
 };

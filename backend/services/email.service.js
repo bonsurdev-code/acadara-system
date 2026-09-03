@@ -41,11 +41,22 @@ export const sendMentorWelcomeEmail = async ({ to, name, acadara_email, password
     <html>
       <body style="font-family: sans-serif; color: #1e293b;">
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; max-width: 600px;">
-          <h1 style="color: #4f46e5;">Welcome to the inner circle, ${name}.</h1>
+          <h1 style="color: #4f46e5; margin-top: 0;">Welcome to the inner circle, ${name}.</h1>
           <p>Your application to join <strong>Acadara</strong> as a mentor has been officially approved.</p>
-          <div style="background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 20px;">
-            <p><strong>Access Email:</strong> ${acadara_email}</p>
-            <p><strong>Temporary Password:</strong> ${password}</p>
+          
+          <div style="background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+            <p style="margin: 0 0 10px 0;"><strong>Access Email:</strong> ${acadara_email}</p>
+            <p style="margin: 0;"><strong>Temporary Password:</strong> ${password}</p>
+          </div>
+
+          <!-- Password Warning Notice -->
+          <div style="background: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 14px 16px;">
+            <p style="margin: 0; color: #92400e; font-size: 14px; font-weight: 600;">
+              ⚠️ Security Action Required:
+            </p>
+            <p style="margin: 4px 0 0 0; color: #b45309; font-size: 13px; line-height: 1.5;">
+              This password is temporary. Please log in and <strong>change your password immediately</strong> from your profile settings to keep your account secure.
+            </p>
           </div>
         </div>
       </body>
