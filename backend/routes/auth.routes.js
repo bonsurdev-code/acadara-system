@@ -1,11 +1,13 @@
 import { Router } from 'express';
-import { register, login, logout, oauthLogin } from '../controllers/auth.controller.js';
+import { register, login, logout, oauthLogin, verifyOTP, resendOTP } from '../controllers/auth.controller.js';
 import { validate, verifyToken } from '../middlewares/auth.middleware.js';
 import { loginSchema, registerSchema } from '../validations/auth.validation.js';
 
 const router = Router();
 
 router.post('/register', validate(registerSchema), register);
+router.post('/verify-otp', verifyOTP);
+router.post('/resend-otp', resendOTP);
 router.post('/login', validate(loginSchema), login);
 router.post('/logout', verifyToken, logout);
 

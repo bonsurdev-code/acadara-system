@@ -68,3 +68,43 @@ export const sendMentorWelcomeEmail = async ({ to, name, acadara_email, password
     throw error;
   }
 };
+
+/**
+ * Sends OTP Email using Gmail API REST endpoint
+ */
+export const sendOTPEmail = async ({ to, otp }) => {
+  const rawMessage = [
+    `From: Acadara Team <${process.env.GMAIL_USER}>`,
+    `To: ${to}`,
+    `Subject: =?utf-8?B?${Buffer.from('🔑 Your Acadara Verification Code').toString('base64')}?=`,
+    'Content-Type: text/html; charset=utf-8',
+    'MIME-Version: 1.0',
+    '',
+    `<!DOCTYPE html>
+    <html>
+      <body style="font-family: sans-serif; color: #1e293b; background-color: #f8fafc; padding: 24px;">
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; max-width: 500px; margin: 0 auto; text-align: center;">
+          <h1 style="color: #4f46e5; margin-bottom: 8px;">Verify Your Email</h1>
+          <p style="color: #64748b;">Use the 6-digit verification code below to complete your registration on <strong>Acadara</strong>.</p>
+          <div style="background: #f1f5f9; border-radius: 12px; padding: 16px; margin: 24px 0;">
+            <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #0f172a;">${otp}</span>
+          </div>
+          <p style="font-size: 14px; color: #94a3b8;">This code will expire in 10 minutes.</p>
+        </div>
+      </body>
+    </html>`,
+  ].join('\r\n');
+
+  const encodedMessage = encodeMessage(rawMessage);
+
+  try {
+    const response = await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: { raw: encodedMessage },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to send OTP email via Gmail API:', error);
+    throw error;
+  }
+};

@@ -17,6 +17,8 @@ apiClient.interceptors.response.use(
       error.response?.data?.error ||
       'Something went wrong';
 
+    error.customMessage = message;
+
     if (error.response?.status === 401) {
       console.warn('Unauthorized');
     }
@@ -29,11 +31,7 @@ apiClient.interceptors.response.use(
       console.error('Server error');
     }
 
-    return Promise.reject({
-      message,
-      status: error.response?.status,
-      original: error,
-    });
+    return Promise.reject(error);
   }
 );
 

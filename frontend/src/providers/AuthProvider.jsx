@@ -33,13 +33,15 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     setLoading(true);
+    setError(null);
     try {
       await authService.login(credentials);
-
       const response = await authService.verifySession();
       await handleAuthSuccess(response);
     } catch (error) {
-      setError(error.message);
+      const msg = error.customMessage || error.message || 'Login failed';
+      setError(msg);
+      throw error; // Essential: allows LoginModal's catch block to intercept the 403
     } finally {
       setLoading(false);
     }
@@ -47,15 +49,50 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     setLoading(true);
+    setError(null);
     try {
-      await authService.register(userData);
-
-      const response = await authService.verifySession();
-      await handleAuthSuccess(response);
+      const response = await authService.register(userData);
+      return response; 
     } catch (error) {
-      setError(error.message);
+      const msg = 
+        error.customMessage || 
+        error.response?.data?.message || 
+        error.message || 
+        'Registration failed';
+      
+      setError(msg);
+      throw error;
     } finally {
       setLoading(false);
+    }
+  };
+
+  const verifyOTP = async (payload) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await authService.verifyOTP(payload);
+      const userSession = await authService.verifySession();
+      await handleAuthSuccess(userSession);
+      return response.data;
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Verification failed';
+      setError(msg);
+      throw new Error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resendOTP = async (payload) => {
+    setError(null);
+    try {
+      const response = await authService.resendOTP(payload);
+      return response.data;
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to resend OTP';
+      setError(msg);
+      throw new Error(msg);
     }
   };
 
@@ -90,7 +127,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, register, logout, oauthLogin, loading, error }}>
+    <AuthContext.Provider value={{ user, setUser, login, register, logout, oauthLogin, verifyOTP, resendOTP, loading, error, setError }}>
       {children}
     </AuthContext.Provider>
   );

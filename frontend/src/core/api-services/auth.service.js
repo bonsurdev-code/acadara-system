@@ -21,6 +21,17 @@ export const authService = {
     return data;
   },
 
+  verifyOTP: async (payload) => {
+    const { data } = await apiClient.post('/auth/verify-otp', { otp: payload.otp, usr_email: payload.usr_email });
+    return data;
+  },
+
+  resendOTP: async (payload) => {
+    const email = typeof payload === 'string' ? payload : payload?.usr_email;
+    const { data } = await apiClient.post('/auth/resend-otp', { usr_email: email });
+    return data;
+  },
+
   oauthLogin: async (provider, token) => {
     const { data } = await apiClient.post(`/auth/oauth/${provider}`, { token });
     return data;
